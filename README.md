@@ -19,7 +19,11 @@ The application includes the following functionalities:
 
 ## Video Walkthrough
 Here's a walkthrough of implemented user stories:
+
+
 ![project%208%20video-2](https://github.com/magacek/Movie_Finder/assets/70607808/d7010ebe-2283-4828-a1c2-cd9eb679872f)
+
+
 
 
 
