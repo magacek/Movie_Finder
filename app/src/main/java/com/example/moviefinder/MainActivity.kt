@@ -1,4 +1,6 @@
 package com.example.moviefinder
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -6,6 +8,7 @@ import android.view.MenuItem
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
@@ -27,21 +30,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-//    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        menuInflater.inflate(R.menu.main, menu)
-//        return true
-//    }
-//
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        return when (item.itemId) {
-//            R.id.action_feedback -> {
-//                // Write code to handle feedback action
-//                true
-//            }
-//            else -> super.onOptionsItemSelected(item)
-//        }
-//    }
     private fun getMovieDetails(title: String) {
         val call = RetrofitClient.instance.create(ApiService::class.java).getMovieDetails(apiKey = "9e17ba6f", title = title)
         call.enqueue(object : Callback<MovieResponse> {
@@ -52,10 +40,38 @@ class MainActivity : AppCompatActivity() {
                     Glide.with(this@MainActivity)
                         .load(movie?.Poster)
                         .into(imageViewPoster)
+
+                    // Update the TextViews with movie information
+                    findViewById<TextView>(R.id.textViewTitle).text = movie?.Title
+                    findViewById<TextView>(R.id.textViewYear).text = "Year: ${movie?.Year}"
+                    findViewById<TextView>(R.id.textViewRating).text = "Rated: ${movie?.Rated}"
+                    findViewById<TextView>(R.id.textViewRuntime).text = "Runtime: ${movie?.Runtime}"
+                    findViewById<TextView>(R.id.textViewGenre).text = "Genre: ${movie?.Genre}"
+                    findViewById<TextView>(R.id.textViewIMDbRating).text = "IMDb Rating: ${movie?.imdbRating}"
+
+                    // IMDb link TextView click listener
+                    val imdbLinkTextView = findViewById<TextView>(R.id.textViewIMDbLink)
+                    imdbLinkTextView.text = "IMDb: ${movie?.imdbID}"
+                    imdbLinkTextView.setOnClickListener {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.imdb.com/title/${movie?.imdbID}"))
+                        startActivity(intent)
+                    }
+
+                    // Share button click listener
+                    val shareButton = findViewById<Button>(R.id.buttonShare)
+                    shareButton.setOnClickListener {
+                        val shareIntent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, "Check out this movie: ${movie?.Title} on IMDb: https://www.imdb.com/title/${movie?.imdbID}")
+                            type = "text/plain"
+                        }
+                        startActivity(Intent.createChooser(shareIntent, "Share via"))
+                    }
                 } else {
                     Log.e("MainActivity", "Error: ${response.errorBody()?.string()}")
                 }
             }
+
             override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
                 Log.e("MainActivity", "Failure: ${t.message}")
             }
