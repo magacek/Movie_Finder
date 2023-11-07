@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Movie Finder</string>
+    <string name="movie_poster">Movie Poster</string>
+    <string name="your_string_name"><u>Your Underlined Text</u></string>
+
+</resources>
